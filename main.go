@@ -95,7 +95,7 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 	if err_ != nil {
 		err := MalformedRequestError{err_.Error()}
 		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusBadRequest,
+			StatusCode: err.Status(),
 			Headers:    map[string]string{"Content-Type": err.ContentType()},
 			Body:       err.Error(),
 		}, nil
