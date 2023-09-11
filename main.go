@@ -94,35 +94,59 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 	err_ := json.Unmarshal([]byte(req.Body), &request)
 	if err_ != nil {
 		err := MalformedRequestError{err_.Error()}
-		return events.APIGatewayProxyResponse{StatusCode: http.StatusBadRequest, Body: err.Error()}, nil
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusBadRequest,
+			Headers:    map[string]string{"Content-Type": err.ContentType()},
+			Body:       err.Error(),
+		}, nil
 	}
 
 	// Check if the request parameter matches the actual master password
 	initMasterPasswordErr := initMasterPassword(request.Password)
 	if initMasterPasswordErr != nil {
-		return events.APIGatewayProxyResponse{StatusCode: initMasterPasswordErr.Status(), Body: initMasterPasswordErr.Error()}, nil
+		return events.APIGatewayProxyResponse{
+			StatusCode: initMasterPasswordErr.Status(),
+			Headers:    map[string]string{"Content-Type": initMasterPasswordErr.ContentType()},
+			Body:       initMasterPasswordErr.Error(),
+		}, nil
 	}
 
 	password := request.Password
 	if password != *masterPassword {
 		err := AuthError{}
-		return events.APIGatewayProxyResponse{StatusCode: err.Status(), Body: err.Error()}, nil
+		return events.APIGatewayProxyResponse{
+			StatusCode: err.Status(),
+			Headers:    map[string]string{"Content-Type": err.ContentType()},
+			Body:       err.Error(),
+		}, nil
 	}
 
 	response, err := internalHandler(request)
 
 	if err != nil {
-		return events.APIGatewayProxyResponse{StatusCode: err.Status(), Body: err.Error()}, nil
+		return events.APIGatewayProxyResponse{
+			StatusCode: err.Status(),
+			Headers:    map[string]string{"Content-Type": err.ContentType()},
+			Body:       err.Error(),
+		}, nil
 	}
 
 	responseJSON, err_ := json.Marshal(response)
 	if err_ != nil {
 		json_err := err_.Error()
 		err := InternalError{&json_err}
-		return events.APIGatewayProxyResponse{StatusCode: http.StatusInternalServerError, Body: err.Error()}, nil
+		return events.APIGatewayProxyResponse{
+			StatusCode: err.Status(),
+			Headers:    map[string]string{"Content-Type": err.ContentType()},
+			Body:       err.Error(),
+		}, nil
 	}
 
-	return events.APIGatewayProxyResponse{StatusCode: http.StatusOK, Body: string(responseJSON)}, nil
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusOK,
+		Headers:    map[string]string{"Content-Type": "application/json"},
+		Body:       string(responseJSON),
+	}, nil
 }
 
 func main() {

@@ -8,6 +8,7 @@ import (
 type PwnyXprsError interface {
 	error
 	Status() int
+	ContentType() string
 }
 
 type MalformedRequestError struct {
@@ -28,12 +29,20 @@ func (e MalformedRequestError) Status() int {
 	return http.StatusBadRequest
 }
 
+func (e MalformedRequestError) ContentType() string {
+	return "text/plain"
+}
+
 func (e AuthError) Error() string {
 	return "invalid master password"
 }
 
 func (e AuthError) Status() int {
 	return http.StatusForbidden
+}
+
+func (e AuthError) ContentType() string {
+	return "text/plain"
 }
 
 func (e InternalError) Error() string {
@@ -46,4 +55,8 @@ func (e InternalError) Error() string {
 
 func (e InternalError) Status() int {
 	return http.StatusInternalServerError
+}
+
+func (e InternalError) ContentType() string {
+	return "text/plain"
 }
