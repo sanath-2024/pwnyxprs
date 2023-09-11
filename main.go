@@ -9,8 +9,8 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-// bash build script: GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o bootstrap
-// PowerShell build script: $env:GOARCH="amd64"; $env:GOOS="linux"; go build -tags lambda.norpc -o bootstrap
+// bash build script: GOOS=linux GOARCH=arm64 go build -tags lambda.norpc -o bootstrap
+// PowerShell build script: $env:GOARCH="arm64"; $env:GOOS="linux"; go build -tags lambda.norpc -o bootstrap
 
 // generic function to deserialize the "request" field of the request
 func deserialize[M MethodRequest](request Request) (M, PwnyXprsError) {
