@@ -339,7 +339,7 @@ func handleExport(req ExportRequest) (Response, PwnyXprsError) {
 		objectName string
 		password   []byte
 	}
-	pw_chan := make(chan PwResp)
+	pw_chan := make(chan PwResp, len(listResponse.List.Passwords))
 	for _, objectName := range listResponse.List.Passwords {
 		go func(objectName string) {
 			getResponse, getError := getObject(objectName)
@@ -379,7 +379,7 @@ func handleExportPlain(req ExportPlainRequest, masterPW string) (Response, PwnyX
 		objectName string
 		password   string
 	}
-	pw_chan := make(chan PwResp)
+	pw_chan := make(chan PwResp, len(listResponse.List.Passwords))
 	for _, objectName := range listResponse.List.Passwords {
 		go func(objectName string) {
 			getResponse, getError := handleGet(GetRequest{Name: objectName}, masterPW)
